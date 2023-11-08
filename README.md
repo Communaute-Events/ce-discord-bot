@@ -10,7 +10,7 @@ The most important features are:
 - YAML Config Loader
     > There's a global function available named `loadYaml()`. In the config, you can specify a path from where to load files from.
     > Example:
-    > ```ts
+    > ```javascript
         const config = loadYaml("admins.yml")
         console.log(config)
 
@@ -18,7 +18,7 @@ The most important features are:
 
 There's also utilites functions (`@src/core/utilites.ts`)
 - ANSI color formatting
-    > ```ts
+    > ```javascript
         console.log(ansi("%yellow%This message is yellow!%end%"))```
     > You can see and add more colors by peeking into the file.
 - Logging function
