@@ -19,6 +19,7 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
+    "discord.js": "^14.13.0",
     "dotenv": "^16.3.1",
     "import-sync": "^2.1.2",
     "ora": "^3.2.0"

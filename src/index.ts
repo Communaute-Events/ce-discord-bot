@@ -8,7 +8,7 @@ import { ansi, spinner } from "@core/utilities"
 import { deployCommands, getCommands } from "@src/core/deploy-commands"
 
 // Imports
-import { Client, Collection, Events, GatewayIntentBits } from "discord.js"
+import { Client, Events, GatewayIntentBits } from "discord.js"
 
 // Main
 const client = new Client({intents: [GatewayIntentBits.Guilds]})
