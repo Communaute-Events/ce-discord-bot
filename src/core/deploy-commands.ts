@@ -41,8 +41,8 @@ function scanCommands(directory: string, log=true): Command[] {
                     }
                 } catch (error) {
                     // Handle potential errors when loading TypeScript files
-                    console.error(ansi(`%light_red%%bold%✗ Error processing file: ${filePath}%end%`));
-                    console.error(error);
+                    console.log(ansi(`%light_red%%bold%✗ Error processing file: ${filePath}%end%`));
+                    console.log(error);
                 }
             }
         }
