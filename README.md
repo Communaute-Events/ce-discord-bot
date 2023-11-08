@@ -14,14 +14,12 @@ The most important features are:
         const config = loadYaml("admins.yml")
         console.log(config)
 
-        // Output: { origaming: "cool", you: "awesome!" }
-    ```
+        // Output: { origaming: "cool", you: "awesome!" }```
 
 There's also utilites functions (`@src/core/utilites.ts`)
 - ANSI color formatting
     > ```ts
-        console.log(ansi("%yellow%This message is yellow!%end%"))
-        ```
+        console.log(ansi("%yellow%This message is yellow!%end%"))```
     > You can see and add more colors by peeking into the file.
 - Logging function
     > Simple logging with colors (info, warn, error, success, minimal)
