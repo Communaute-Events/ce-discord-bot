@@ -31,6 +31,10 @@ There's also utilites functions (`@src/core/utilites.ts`)
 
 More features will come in the future!
 
+### Examples
+
+There's some example commands in `@src/commands`
+
 ### Contributing
 
 Feel free to open issues, PRs, etc... I'm not very familiar with git so I may take a little bit of time to accept your changes. Please note that this is my first real typescript project. So sorry for the little bugs 😅
