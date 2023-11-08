@@ -1,0 +1,24 @@
+{
+  "name": "discord-dev-env",
+  "version": "1.0.0",
+  "description": "A discord dev environnement",
+  "main": "src/index.ts",
+  "scripts": {
+    "start": "ts-node -r tsconfig-paths/register src/index.ts",
+    "url": "ts-node -r tsconfig-paths/register src/core/url.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "resolve-tspaths": "^0.8.17",
+    "ts-node": "^10.9.1",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "import-sync": "^2.1.2",
+    "ora": "^3.2.0"
+  }
+}
