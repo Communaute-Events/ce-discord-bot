@@ -6,8 +6,5 @@ export default {
 		.setDescription('Replies with Pong!'),
 	async execute(interaction) {
 		await interaction.reply('Pong!');
-	},
-	guilds: [
-		"1149082137123880990"
-	]
+	}
 };

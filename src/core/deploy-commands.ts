@@ -68,6 +68,17 @@ export function getCommands() {
 
 export async function deployCommands() {
     const rest = new REST().setToken(process.env.BOT_TOKEN);
+    let spin = spinner("Clearing global commands cache...","blue")
+    try {
+        await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), {
+            body: []
+        })
+        spin.stop()
+        logging("Cleared global commands cache!","success")
+    } catch (error) {
+        spin.stop()
+        logging("An error occured when trying to clear the global commands cache\n"+ error,"error")
+    }
 
     const commands = getCommandObjects()
     for (const command of commands) {
