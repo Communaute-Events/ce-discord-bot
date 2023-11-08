@@ -8,20 +8,20 @@ The most important features are:
 - Working Path Aliases
     > No more `../../folder/file.txt` in your imports! You can now define path aliases in the `tsconfig.json` file so you can import your files like `@src/folder/file`.
 - YAML Config Loader
-    > There's a global function avaiable named `loadYaml()`. In the config, you can specify a path from where to load files from.
+    > There's a global function available named `loadYaml()`. In the config, you can specify a path from where to load files from.
     > Example:
     > ```ts
-    const config = loadYaml("admins.yml")
-    console.log(config)
+        const config = loadYaml("admins.yml")
+        console.log(config)
 
-    // Output: { origaming: "cool", you: "awesome!" }
+        // Output: { origaming: "cool", you: "awesome!" }
     ```
 
 There's also utilites functions (`@src/core/utilites.ts`)
 - ANSI color formatting
     > ```ts
-    console.log(ansi("%yellow%This message is yellow!%end%"))
-    ```
+        console.log(ansi("%yellow%This message is yellow!%end%"))
+        ```
     > You can see and add more colors by peeking into the file.
 - Logging function
     > Simple logging with colors (info, warn, error, success, minimal)
