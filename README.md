@@ -1,6 +1,4 @@
-# Discord Dev Env
-
-**⚠️ Currently in an unfinished state**
+# Discord Dev Env ⭐
 
 This template serves the purpose of making the developpement of discord bots less tedious. It is shipped with many features like a .yaml config loader and other cool things.
 
