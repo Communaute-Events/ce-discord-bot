@@ -9,6 +9,6 @@ export default {
 	},
 	guilds: [
 		// Put your guild ids here! This is for guild specifics commands. Make sure it is a string!!!!
-		"1149082137123880990"
+		""
 	]
 };
