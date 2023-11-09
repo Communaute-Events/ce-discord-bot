@@ -1,6 +1,6 @@
 {
   "name": "discord-dev-env",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A discord dev environnement",
   "main": "src/index.ts",
   "scripts": {
@@ -12,7 +12,6 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "resolve-tspaths": "^0.8.17",
     "ts-node": "^10.9.1",
     "tsc-alias": "^1.8.8",
     "tsconfig-paths": "^4.2.0",

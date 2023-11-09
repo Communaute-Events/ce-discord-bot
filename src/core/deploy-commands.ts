@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import path from 'path';
 import * as ts from 'ts-node';
 import importSync from 'import-sync';
-import { SlashCommandBuilder, REST, Routes, Collection } from 'discord.js';
+import { SlashCommandBuilder, REST, Routes, Collection, Snowflake } from 'discord.js';
 import { ansi, logging, spinner } from './utilities';
 
 const loggingConfig = loadYaml("logging.yml")
@@ -15,7 +15,7 @@ interface Command {
     guilds?: string[]
 }
 
-function scanCommands(directory: string, log=true): Command[] {
+function scanCommands(directory: string, log = true): Command[] {
     const results: Command[] = [];
 
     function scanDirectory(dir: string) {
@@ -54,13 +54,13 @@ function scanCommands(directory: string, log=true): Command[] {
 
 function getCommandObjects(logging?: boolean) {
     const commandsPath = path.join(path.dirname(__dirname), 'commands');
-    const commandFiles = scanCommands(commandsPath,logging)
+    const commandFiles = scanCommands(commandsPath, logging)
     return commandFiles
 }
 
 export function getCommands() {
     const commands = new Collection()
-    getCommandObjects(false).map((cmd)=>{
+    getCommandObjects(false).map((cmd) => {
         commands.set(cmd.data.name, cmd)
     })
     return commands
@@ -68,46 +68,76 @@ export function getCommands() {
 
 export async function deployCommands() {
     const rest = new REST().setToken(process.env.BOT_TOKEN);
-    let spin = spinner("Clearing global commands cache...","blue")
+    let spin = spinner("Clearing global commands cache...", "blue")
     try {
         await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), {
             body: []
         })
         spin.stop()
-        logging("Cleared global commands cache!","success")
+        logging("Cleared global commands cache!", "success")
     } catch (error) {
         spin.stop()
-        logging("An error occured when trying to clear the global commands cache\n"+ error,"error")
+        logging("An error occured when trying to clear the global commands cache\n" + error, "error")
     }
 
     const commands = getCommandObjects()
+    const guildCommands = new Collection()
+    const globalCommands = []
+    // Save guild commands in a collection, and global commands in an array
     for (const command of commands) {
         if ("guilds" in command) {
-            let spin = spinner(ansi(`(/) Started reloading the "${command.data.name}" command for %underline%${command.guilds.length}%end% guild(s)%end%`), "yellow").start()
+            let didError = false
+            let errorMessage: string;
             for (const guild of command.guilds) {
-                try {
-                    const data = await rest.put(Routes.applicationGuildCommands(process.env.CLIENT_ID, guild), {
-                        body: [command.data.toJSON()]
-                    })
-                } catch (error) {
-                    spin.stop()
-                    console.log(logging(`(/) Exception occured while loading "${command.data.name}":\n${error}`, "error"))
+                let currentGuildCommands = []
+                if (guild in guildCommands) {
+                    currentGuildCommands = guildCommands.get(guild) as any
                 }
+                try {
+                    currentGuildCommands.push(command.data.toJSON())
+                } catch (error) {
+                    errorMessage = error
+                }
+                guildCommands.set(guild, currentGuildCommands)
             }
-            spin.stop()
-            logging(`(/) Reloaded the "${command.data.name}" command for %underline%${command.guilds.length}%end%%light_green% guild(s)%end%`,"success")
+            if (didError) {
+                logging(`(/) Exception occured while loading "${command.data.name}":\n${errorMessage}`, "error")
+            }
         } else {
-            let spin = spinner(ansi(`(/) Started reloading the "${command.data.name}" global command%end%`), "yellow").start()
             try {
-                const data = await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), {
-                    body: [command.data.toJSON()]
-                })
+                globalCommands.push(command.data.toJSON())
             } catch (error) {
-                spin.stop()
-                console.log(logging(`(/) Exception occured while loading "${command.data.name}":\n${error}`, "error"))
+                logging(`(/) Exception occured while loading "${command.data.name}":\n${error}`, "error")
             }
-            spin.stop()
-            logging(`(/) Reloaded the "${command.data.name}" global command.%end%`,"success")
         }
+    }
+    // Reload guild commands
+    spin = spinner(`(/) Reloading commands for ${guildCommands.size} guilds...`,"yellow")
+    guildCommands.forEach(async (guildCmd, guildId: string) => {
+        try {
+            const data = await rest.put(Routes.applicationGuildCommands(process.env.CLIENT_ID, "" + guildId), {
+                body: guildCmd
+            })
+
+        } catch (error) {
+            spin.clear()
+            logging(`(/) Exception occured while refreshing commands for "${guildId}":\n${error}`, "error")
+            spin.render()
+        }
+    })
+    spin.stop()
+    logging(`(/) Reloaded guild-specific commands for ${guildCommands.size} guilds.`,"success")
+
+    // Reload global commands
+    spin = spinner(`(/) Reloading ${globalCommands.length} global commands`, "yellow")
+    try {
+        const data = await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), {
+            body: globalCommands
+        })
+        spin.stop()
+        logging(`(/) Reloaded ${globalCommands.length} global commands`, "success")
+    } catch (error) {
+        spin.stop()
+        logging(`(/) Exception occured while reloading the global commands:\n${error}`, "error")
     }
 }

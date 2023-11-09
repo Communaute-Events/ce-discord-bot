@@ -12,7 +12,8 @@
         "paths": {
             "@src/*": ["src/*"],
             "@config/*": ["config/*"],
-            "@core/*": ["src/core/*"]
+            "@core/*": ["src/core/*"],
+            "@types/*": ["src/@types/*"]
         },
         "typeRoots": [
             "src/@types",
