@@ -1,3 +1,4 @@
+![https://img.shields.io/badge/just%20the%20message-8A2BE2](badge)
 # Discord Dev Env ⭐
 
 This template serves the purpose of making the developpement of discord bots less tedious. It is shipped with many features like a .yaml config loader and other cool things.
