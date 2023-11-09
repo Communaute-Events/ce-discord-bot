@@ -1,5 +1,5 @@
 // Pre-run scripts
-import "@core/globals"
+import "@core/start"
 import "@core/globals"
 import 'dotenv/config'
 
