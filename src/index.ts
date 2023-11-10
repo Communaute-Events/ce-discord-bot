@@ -11,8 +11,10 @@ import { execute } from "@core/execute-commands"
 // Imports
 import { Client, Events, GatewayIntentBits, Interaction } from "discord.js"
 import { handleInteractionTypes } from "./interactions/handle-types"
+import { Server } from "socket.io"
 
 // Main
+const io = new Server
 const client = new Client({intents: [GatewayIntentBits.Guilds]})
 client.commands = getCommands()
 let spin = spinner("Initializing Client","yellow").start()

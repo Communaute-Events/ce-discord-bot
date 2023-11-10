@@ -8,7 +8,6 @@ export default {
 		await interaction.reply('Help is coming!');
 	},
 	guilds: [
-		// Put your guild ids here! This is for guild specifics commands. Make sure it is a string!!!!
-		""
+		"1171557764703723611"
 	]
 };

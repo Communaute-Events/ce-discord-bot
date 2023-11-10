@@ -1,7 +1,7 @@
 {
-  "name": "discord-dev-env",
+  "name": "ce-discord-bot",
   "version": "1.1.0",
-  "description": "A discord dev environnement",
+  "description": "Communauté Event's discord bot",
   "main": "src/index.ts",
   "scripts": {
     "start": "ts-node -r tsconfig-paths/register src/index.ts",
@@ -22,6 +22,7 @@
     "dotenv": "^16.3.1",
     "import-sync": "^2.1.2",
     "js-yaml": "^4.1.0",
-    "ora": "^3.2.0"
+    "ora": "^3.2.0",
+    "socket.io": "^4.7.2"
   }
 }
