@@ -13,7 +13,9 @@
             "@src/*": ["src/*"],
             "@config/*": ["config/*"],
             "@core/*": ["src/core/*"],
-            "@types/*": ["src/@types/*"]
+            "@types/*": ["src/@types/*"],
+            "@embeds/*": ["src/embeds/*"],
+            "@img/*": ["src/img/*"],
         },
         "typeRoots": [
             "src/@types",
