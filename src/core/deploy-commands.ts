@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import path from 'path';
 import * as ts from 'ts-node';
 import importSync from 'import-sync';
-import { SlashCommandBuilder, REST, Routes, Collection, Snowflake } from 'discord.js';
+import { SlashCommandBuilder, REST, Routes, Collection } from 'discord.js';
 import { ansi, logging, spinner } from './utilities';
 
 const loggingConfig = loadYaml("logging.yml")
@@ -13,6 +13,10 @@ interface Command {
     data: SlashCommandBuilder,
     execute: Function,
     guilds?: string[]
+}
+
+function firstline(path: string) {
+    return fs.readFileSync(path, "utf-8").split("\n")[0]
 }
 
 function scanCommands(directory: string, log = true): Command[] {
@@ -28,7 +32,7 @@ function scanCommands(directory: string, log = true): Command[] {
             if (stats.isDirectory()) {
                 // Recursively scan subdirectories
                 scanDirectory(filePath);
-            } else if (stats.isFile() && filePath.endsWith('.ts')) {
+            } else if (stats.isFile() && filePath.endsWith('.ts') && (firstline(filePath) == "// @command" || firstline(filePath) == "//@command")) {
                 try {
                     // Load the TypeScript file using ts-node
                     const module = importSync(filePath)

@@ -7,7 +7,7 @@
         "esModuleInterop": true,
         "baseUrl": "./",
         "moduleResolution": "node",
-        "module": "CommonJS",
+        "lib": ["es2019", "es2020.bigint", "es2020.string", "es2020.symbol.wellknown"],
         "moduleDetection": "force",
         "paths": {
             "@src/*": ["src/*"],
@@ -22,7 +22,7 @@
             "node_modules/@types"
         ],
         "outDir": "dist",
-        "target": "es2020"
+        "target": "ES2019"
     },
     "exclude": [
         "node_modules"
