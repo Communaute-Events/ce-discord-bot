@@ -21,4 +21,4 @@ MONGO_URI=<mongodb uri>
 
 ### Contributing
 
-Feel free to open issues, PRs, etc... I'm not very familiar with git so I may take a little bit of time to accept your changes. Please note that this is my first real typescript project. So sorry for the little bugs 😅
+Feel free to open issues, PRs, etc... I'm not very familiar with git so I may take a little bit of time to accept your changes.
