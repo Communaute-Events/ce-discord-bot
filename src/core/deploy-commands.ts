@@ -15,6 +15,10 @@ interface Command {
     guilds?: string[]
 }
 
+function firstline(path: string) {
+    return fs.readFileSync(path,"utf-8").split("\n")[0]
+}
+
 function scanCommands(directory: string, log = true): Command[] {
     const results: Command[] = [];
 
@@ -28,7 +32,7 @@ function scanCommands(directory: string, log = true): Command[] {
             if (stats.isDirectory()) {
                 // Recursively scan subdirectories
                 scanDirectory(filePath);
-            } else if (stats.isFile() && filePath.endsWith('.ts')) {
+            } else if (stats.isFile() && filePath.endsWith('.ts') && firstline(filePath).includes("@command")) {
                 try {
                     // Load the TypeScript file using ts-node
                     const module = importSync(filePath)

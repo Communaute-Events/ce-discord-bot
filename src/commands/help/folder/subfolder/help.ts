@@ -1,3 +1,4 @@
+// @command
 import { SlashCommandBuilder } from 'discord.js'
 
 export default {
@@ -9,6 +10,5 @@ export default {
 	},
 	guilds: [
 		// Put your guild ids here! This is for guild specifics commands. Make sure it is a string!!!!
-		""
 	]
 };

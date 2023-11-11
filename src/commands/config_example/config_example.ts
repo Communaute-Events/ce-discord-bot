@@ -1,3 +1,4 @@
+// @command
 import { SlashCommandBuilder } from 'discord.js'
 const config = loadYaml("example.yml")
 
