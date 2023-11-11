@@ -6,6 +6,8 @@ This template serves the purpose of making the developpement of discord bots les
 
 ## Features
 
+To register a slash command, add `// @command` to the top of the file
+
 The most important features are:
 - Working Path Aliases
     > No more `../../folder/file.txt` in your imports! You can now define path aliases in the `tsconfig.json` file so you can import your files like `@src/folder/file`.
