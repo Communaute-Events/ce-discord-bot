@@ -13,8 +13,10 @@ import { Client, Events, GatewayIntentBits, Interaction } from "discord.js"
 import { handleInteractionTypes } from "./interactions/handle-types"
 
 // Main
-const client = new Client({intents: [GatewayIntentBits.Guilds]})
-client.commands = getCommands()
+const client = new Client({intents: [GatewayIntentBits.Guilds]});
+(async()=>{
+    client.commands = await getCommands()
+})()
 let spin = spinner("Initializing Client","yellow").start()
 
 client.once(Events.ClientReady, async(c) => {

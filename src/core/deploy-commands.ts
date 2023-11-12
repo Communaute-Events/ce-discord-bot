@@ -1,7 +1,6 @@
 import * as fs from 'fs';
 import path from 'path';
 import * as ts from 'ts-node';
-import importSync from 'import-sync';
 import { SlashCommandBuilder, REST, Routes, Collection, Snowflake } from 'discord.js';
 import { ansi, logging, spinner } from './utilities';
 
@@ -19,10 +18,10 @@ function firstline(path: string) {
     return fs.readFileSync(path,"utf-8").split("\n")[0]
 }
 
-function scanCommands(directory: string, log = true): Command[] {
+async function scanCommands(directory: string, log = true): Promise<Command[]> {
     const results: Command[] = [];
 
-    function scanDirectory(dir: string) {
+    async function scanDirectory(dir: string) {
         const files = fs.readdirSync(dir);
 
         for (const file of files) {
@@ -35,7 +34,7 @@ function scanCommands(directory: string, log = true): Command[] {
             } else if (stats.isFile() && filePath.endsWith('.ts') && firstline(filePath).includes("@command")) {
                 try {
                     // Load the TypeScript file using ts-node
-                    const module = importSync(filePath)
+                    const module = await import(filePath)
                     if (module.default && module.default.data && module.default.execute) {
                         results.push(module.default);
                     } else {
@@ -52,21 +51,21 @@ function scanCommands(directory: string, log = true): Command[] {
         }
     }
 
-    scanDirectory(directory);
+    await scanDirectory(directory);
     return results;
 }
 
-function getCommandObjects(logging?: boolean) {
+async function getCommandObjects(logging?: boolean) {
     const commandsPath = path.join(path.dirname(__dirname), 'commands');
-    const commandFiles = scanCommands(commandsPath, logging)
+    const commandFiles = await scanCommands(commandsPath, logging)
     return commandFiles
 }
 
-export function getCommands() {
+export async function getCommands() {
     const commands = new Collection()
-    getCommandObjects(false).map((cmd) => {
+    await getCommandObjects(false).then(obj => obj.map((cmd) => {
         commands.set(cmd.data.name, cmd)
-    })
+    }))
     return commands
 }
 
@@ -84,7 +83,7 @@ export async function deployCommands() {
         logging("An error occured when trying to clear the global commands cache\n" + error, "error")
     }
 
-    const commands = getCommandObjects()
+    const commands = await getCommandObjects()
     const guildCommands = new Collection()
     const globalCommands = []
     // Save guild commands in a collection, and global commands in an array
