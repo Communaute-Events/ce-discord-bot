@@ -1,6 +1,6 @@
 // @command
-import { SlashCommandBuilder, ChannelType, PermissionFlagsBits, Embed, EmbedBuilder, ChatInputCommandInteraction, CommandInteractionOptionResolver } from 'discord.js'
-import { setChannel } from './functions';
+import { SlashCommandBuilder, ChannelType, PermissionFlagsBits, ChatInputCommandInteraction } from 'discord.js'
+import { changeState, setChannel, pickSource } from './functions';
 
 export default {
     data: new SlashCommandBuilder()
@@ -33,7 +33,10 @@ export default {
         ),
     async execute(interaction: ChatInputCommandInteraction) {
         switch (interaction.options.getSubcommand()) {
-            case "setchannel": setChannel(interaction)
+            case "setchannel": setChannel(interaction); break;
+            case "enable": changeState(interaction, true); break;
+            case "disable": changeState(interaction, false); break;
+            case "pick": pickSource(interaction); break;
         }
     }
 };

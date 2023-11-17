@@ -17,8 +17,10 @@ import { MongoClient, ServerApiVersion } from "mongodb"
 
 // Main
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] })
-client.commands = getCommands()
+const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+(async()=>{
+    client.commands = await getCommands()
+})();
 let spin = spinner("Initializing Client", "yellow").start()
 
 const mongoClient = new MongoClient(process.env.MONGO_URI, {

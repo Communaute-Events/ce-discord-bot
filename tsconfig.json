@@ -3,8 +3,10 @@
         "files": true
     },
     "compilerOptions": {
+        "noEmitOnError": true,
         "resolveJsonModule": true,
         "esModuleInterop": true,
+        "module": "CommonJS",
         "baseUrl": "./",
         "moduleResolution": "node",
         "lib": ["es2019", "es2020.bigint", "es2020.string", "es2020.symbol.wellknown"],
@@ -22,7 +24,7 @@
             "node_modules/@types"
         ],
         "outDir": "dist",
-        "target": "ES2019"
+        "target": "ES2020"
     },
     "exclude": [
         "node_modules"
