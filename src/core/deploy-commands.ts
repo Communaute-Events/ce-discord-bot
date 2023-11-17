@@ -1,12 +1,9 @@
 import * as fs from 'fs';
 import path from 'path';
-import * as ts from 'ts-node';
 import { SlashCommandBuilder, REST, Routes, Collection, Snowflake } from 'discord.js';
 import { ansi, logging, spinner } from './utilities';
 
 const loggingConfig = loadYaml("logging.yml")
-
-ts.register();
 
 interface Command {
     data: SlashCommandBuilder,
@@ -14,11 +11,11 @@ interface Command {
     guilds?: string[]
 }
 
-function firstline(path: string) {
-    return fs.readFileSync(path,"utf-8").split("\n")[0]
-}
-
 async function scanCommands(directory: string, log = true): Promise<Command[]> {
+    if (log) {
+        logging(`Scanning commands in "${directory}"`,"info")
+    }
+
     const results: Command[] = [];
 
     async function scanDirectory(dir: string) {
@@ -27,11 +24,11 @@ async function scanCommands(directory: string, log = true): Promise<Command[]> {
         for (const file of files) {
             const filePath = path.join(dir, file);
             const stats = fs.statSync(filePath);
-
+            
             if (stats.isDirectory()) {
                 // Recursively scan subdirectories
                 scanDirectory(filePath);
-            } else if (stats.isFile() && filePath.endsWith('.ts') && firstline(filePath).includes("@command")) {
+            } else if (stats.isFile() && (filePath.endsWith('.js') || filePath.endsWith('.ts')) && (fs.readFileSync(filePath,"utf-8").includes("// @command") || fs.readFileSync(filePath,"utf-8").includes("//@command"))) {
                 try {
                     // Load the TypeScript file using ts-node
                     const module = await import(filePath)

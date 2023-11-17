@@ -5,6 +5,7 @@
     "compilerOptions": {
         "resolveJsonModule": true,
         "esModuleInterop": true,
+        "rootDir": "./",
         "baseUrl": "./",
         "moduleResolution": "node",
         "module": "CommonJS",
@@ -13,10 +14,10 @@
             "@src/*": ["src/*"],
             "@config/*": ["config/*"],
             "@core/*": ["src/core/*"],
-            "@types/*": ["src/@types/*"]
+            "@types/*": ["src/types/*"]
         },
         "typeRoots": [
-            "src/@types",
+            "src/types",
             "node_modules/@types"
         ],
         "outDir": "dist",
