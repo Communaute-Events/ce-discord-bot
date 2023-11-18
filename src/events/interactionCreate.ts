@@ -15,6 +15,7 @@ export const event =  {
 
         try {
             await command.execute(interaction)
+            logging(`${interaction.user.globalName} executed the command "${interaction.commandName}" in guild "${interaction.guildId} at ${new Date().toLocaleString()}`,"minimal",false)
         } catch (error) {
             logging(`There was an error executing "${interaction.commandName}":\n${error}`,"error")
             if (interaction.replied || interaction.deferred) {
