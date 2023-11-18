@@ -134,7 +134,7 @@ export function logging(text: string, type: LoggingType, showInTerminal = true) 
         break;
       case "success":
         console.log(`\x1b[1;32m✓ ${text}\x1b[0m`);
-        logger.log(stripAnsi(`${pre} [SUCCESS] ${text}`))
+        logger.log(stripAnsi(`${pre} [INFO] ${text}`))
         break;
       case "warn":
         console.error(`\x1b[0;33m[WARN] ${text}\x1b[0m`);
@@ -155,7 +155,7 @@ export function logging(text: string, type: LoggingType, showInTerminal = true) 
         logger.log(stripAnsi(`${pre} [INFO] ${text}`))
         break;
       case "success":
-        logger.log(stripAnsi(`${pre} [SUCCESS] ${text}`))
+        logger.log(stripAnsi(`${pre} [INFO] ${text}`))
         break;
       case "warn":
         logger.warn(stripAnsi(`${pre} [WARN] ${text}`))
