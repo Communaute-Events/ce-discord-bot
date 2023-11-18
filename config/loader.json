@@ -1,4 +1,0 @@
-{
-    "_comment": "This file is used by the config loader. Here you can define where it should load your files. Default: config",
-    "configDirectory": "config"
-}
