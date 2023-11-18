@@ -1,0 +1,7 @@
+{
+    "Slash Command File": {
+      "prefix": "@command",
+      "body": ["@command"],
+      "description": "Treat this file as a slash command"
+    }
+  }
