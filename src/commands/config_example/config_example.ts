@@ -1,6 +1,6 @@
 // @command
 import { SlashCommandBuilder } from 'discord.js'
-const config = loadYaml("example.yml")
+const config = loadYaml("commands/example.yml")
 
 export default {
 	data: new SlashCommandBuilder()

@@ -2,8 +2,7 @@ import * as fs from 'fs';
 import path from 'path';
 import { SlashCommandBuilder, REST, Routes, Collection, Snowflake } from 'discord.js';
 import { ansi, logging, spinner } from './utilities';
-
-const loggingConfig = loadYaml("logging.yml")
+const loggingConfig = loadYaml("bot/logging.yml")
 
 interface Command {
     data: SlashCommandBuilder,
@@ -30,19 +29,17 @@ async function scanCommands(directory: string, log = true): Promise<Command[]> {
                 scanDirectory(filePath);
             } else if (stats.isFile() && (filePath.endsWith('.js') || filePath.endsWith('.ts')) && (fs.readFileSync(filePath,"utf-8").includes("// @command") || fs.readFileSync(filePath,"utf-8").includes("//@command"))) {
                 try {
-                    // Load the TypeScript file using ts-node
+                    // Load the TypeScript file using import
                     const module = await import(filePath)
                     if (module.default && module.default.data && module.default.execute) {
                         results.push(module.default);
                     } else {
                         if (loggingConfig.unstructuredCommandWarning && log) {
-                            logging(`The command at %bold%${filePath}%end%%yellow% doesn't have a %underline%'data' or 'execute'%end%%yellow% property. It will not be loaded.`, "warn")
+                            logging(ansi(`The command at %bold%${filePath}%end%%yellow% doesn't have a %underline%'data' or 'execute'%end%%yellow% property. It will not be loaded.`), "warn")
                         }
                     }
                 } catch (error) {
-                    // Handle potential errors when loading TypeScript files
-                    console.log(ansi(`%light_red%%bold%✗ Error processing file: ${filePath}%end%`));
-                    console.log(error);
+                    logging(`Error processing file: ${filePath}\n${error}`,"error")
                 }
             }
         }
@@ -67,10 +64,10 @@ export async function getCommands() {
 }
 
 export async function deployCommands() {
-    const rest = new REST().setToken(process.env.BOT_TOKEN);
+    const rest = new REST().setToken(process.env.token);
     let spin = spinner("Clearing global commands cache...", "blue")
     try {
-        await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), {
+        await rest.put(Routes.applicationCommands(process.env.clientId), {
             body: []
         })
         spin.stop()
@@ -86,8 +83,6 @@ export async function deployCommands() {
     // Save guild commands in a collection, and global commands in an array
     for (const command of commands) {
         if ("guilds" in command) {
-            let didError = false
-            let errorMessage: string;
             for (const guild of command.guilds) {
                 let currentGuildCommands = []
                 if (guild in guildCommands) {
@@ -96,12 +91,9 @@ export async function deployCommands() {
                 try {
                     currentGuildCommands.push(command.data.toJSON())
                 } catch (error) {
-                    errorMessage = error
+                    logging(`(/) Exception occured while loading "${command.data.name}":\n${error}`, "error")
                 }
                 guildCommands.set(guild, currentGuildCommands)
-            }
-            if (didError) {
-                logging(`(/) Exception occured while loading "${command.data.name}":\n${errorMessage}`, "error")
             }
         } else {
             try {
@@ -115,10 +107,9 @@ export async function deployCommands() {
     spin = spinner(`(/) Reloading commands for ${guildCommands.size} guilds...`,"yellow")
     guildCommands.forEach(async (guildCmd, guildId: string) => {
         try {
-            const data = await rest.put(Routes.applicationGuildCommands(process.env.CLIENT_ID, "" + guildId), {
+            const data = await rest.put(Routes.applicationGuildCommands(process.env.clientId, "" + guildId), {
                 body: guildCmd
             })
-
         } catch (error) {
             spin.clear()
             logging(`(/) Exception occured while refreshing commands for "${guildId}":\n${error}`, "error")
@@ -131,7 +122,7 @@ export async function deployCommands() {
     // Reload global commands
     spin = spinner(`(/) Reloading ${globalCommands.length} global commands`, "yellow")
     try {
-        const data = await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), {
+        const data = await rest.put(Routes.applicationCommands(process.env.clientId), {
             body: globalCommands
         })
         spin.stop()

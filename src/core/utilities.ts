@@ -1,5 +1,32 @@
-import ora, { Options } from "ora"
+import ora from "ora"
 import { Color, Ora } from "ora"
+import { Console } from "console"
+import path from "path"
+import fs from "fs"
+
+var logger: Console;
+
+function initLogger() {
+  const logsFolder = path.join(path.dirname(path.dirname(__dirname)), "logs")
+  if (!fs.existsSync(logsFolder)) {
+    try {
+      fs.mkdirSync(logsFolder)
+      logging("Created logs folder at: " + logsFolder, "success")
+    } catch (error) {
+      logging("Error while creating the 'logs' folder at '" + logsFolder + "'.", "error")
+    }
+  }
+  const now = new Date()
+  const logStream = fs.createWriteStream(path.join(logsFolder, `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}-${now.getHours()}-${now.getMinutes()}.log`))
+  logger = new Console({
+    stdout: logStream,
+    stderr: logStream
+  })
+}
+
+function stripAnsi(string: string): string {
+  return string.replace(/[\x1b\x9b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,"")
+}
 
 const colors = {
   black: "\x1b[0;30m",
@@ -68,12 +95,57 @@ type LoggingType =
   | "warn"
   | "error"
   | "minimal";
+
+function getCurrentFormattedTime(): string {
+  const currentDate = new Date();
+
+  const day = currentDate.getDate();
+  const hour = currentDate.getHours();
+  const minute = currentDate.getMinutes();
+  const second = currentDate.getSeconds();
+  const millisecond = currentDate.getMilliseconds();
+
+  const formattedDay = padZero(day);
+  const formattedHour = padZero(hour);
+  const formattedMinute = padZero(minute);
+  const formattedSecond = padZero(second);
+  const formattedMillisecond = padZero(millisecond, 3); // Milliseconds need to have 3 digits
+
+  const formattedString = `${formattedDay}-${formattedHour}-${formattedMinute}-${formattedSecond}-${formattedMillisecond}`;
+
+  return formattedString;
+}
+
+function padZero(value, length = 2) {
+  return String(value).padStart(length, '0');
+}
+
 export function logging(text: string, type: LoggingType) {
+  if (logger == null) {
+    initLogger()
+  }
+  let output: string;
+  const pre = `[${getCurrentFormattedTime()}]`
   switch (type) {
-    case "info": console.log(ansi(`%light_blue%\u2139 ${text}%end%`)); break;
-    case "success": console.log(ansi(`%light_green%✓ ${text}%end%`)); break;
-    case "warn": console.error(ansi(`%yellow%[WARN] ${text}%end%`)); break;
-    case "error": console.error(ansi(`%light_red%✖ ${text}%end%`)); break;
-    case "minimal": console.log(ansi(`%dark_gray% ${text}%end%`)); break;
+    case "info":
+      console.log(`\x1b[1;34m\u2139 ${text}\x1b[0m`);
+      logger.log(stripAnsi(`${pre} \u2139 ${text}`))
+      break;
+    case "success":
+      console.log(`\x1b[1;32m✓ ${text}\x1b[0m`);
+      logger.log(stripAnsi(`${pre} ✓ ${text}`))
+      break;
+    case "warn":
+      console.error(`\x1b[0;33m[WARN] ${text}\x1b[0m`);
+      logger.warn(stripAnsi(`${pre} [WARN] ${text}`))
+      break;
+    case "error":
+      console.error(`\x1b[1;31m✖ ${text}\x1b[0m`);
+      logger.error(stripAnsi(`${pre} ✖ ${text}`))
+      break;
+    case "minimal":
+      console.log(`\x1b[1;30m ${text}\x1b[0m`);
+      logger.log(stripAnsi(`${pre} [Minimal] ${text}`))
+      break;
   }
 }

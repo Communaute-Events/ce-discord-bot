@@ -1,4 +1,4 @@
 // Reads your config and logs a link to invite your bot
 
 require("dotenv").config()
-console.log(`\x1b[1;32mhttps://discord.com/api/oauth2/authorize?client_id=${process.env.CLIENT_ID}&permissions=8&scope=applications.commands%20bot\x1b[0m`)
+console.log(`\x1b[1;32mhttps://discord.com/api/oauth2/authorize?clientId=${process.env.clientId}&permissions=8&scope=applications.commands%20bot\x1b[0m`)
