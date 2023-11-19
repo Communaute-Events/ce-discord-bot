@@ -12,16 +12,16 @@ export const event =  {
         }
 
         // Resets commands for the guild if it has leftover slash commands
-        if ("guilds" in command && !interaction.client.commands.find(cmd => {
-            return cmd.guilds && cmd.guilds.includes(interaction.guild.id)
-        })) {
-            const rest = new REST().setToken(process.env.token);
-            const data = await rest.put(Routes.applicationGuildCommands(process.env.clientId, interaction.guildId), {
-                body: []
-            })
-            interaction.reply({content: "The slash command you just used doesn't exist anymore.", ephemeral: true})
-            return
-        }
+        // if ("guilds" in command && !interaction.client.commands.find(cmd => {
+        //     return cmd.guilds && cmd.guilds.includes(interaction.guild.id)
+        // })) {
+        //     const rest = new REST().setToken(process.env.token);
+        //     const data = await rest.put(Routes.applicationGuildCommands(process.env.clientId, interaction.guildId), {
+        //         body: []
+        //     })
+        //     interaction.reply({content: "The slash command you just used doesn't exist anymore.", ephemeral: true})
+        //     return
+        // }
 
         try {
             await command.execute(interaction)
