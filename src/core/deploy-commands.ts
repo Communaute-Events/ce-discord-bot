@@ -89,6 +89,7 @@ export async function deployCommands() {
                     currentGuildCommands = guildCommands.get(guild) as any
                 }
                 try {
+                    if (!currentGuildCommands.find(cmd => cmd.name == command.data.name))
                     currentGuildCommands.push(command.data.toJSON())
                 } catch (error) {
                     logging(`(/) Exception occured while loading "${command.data.name}":\n${error}`, "error")
