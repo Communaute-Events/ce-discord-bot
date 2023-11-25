@@ -1,6 +1,6 @@
 {
   "name": "discord-dev-env",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "description": "A discord dev environnement",
   "main": "src/index.ts",
   "scripts": {

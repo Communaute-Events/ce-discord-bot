@@ -86,7 +86,7 @@ export async function deployCommands() {
             for (const guild of command.guilds) {
                 let currentGuildCommands = []
                 if (guild in guildCommands) {
-                    currentGuildCommands = guildCommands.get(guild) as any
+                    currentGuildCommands = (guildCommands.get(guild) as any[]).filter(cmd => commands.some(storedCmd => storedCmd.data.name == cmd.name))
                 }
                 try {
                     if (!currentGuildCommands.find(cmd => cmd.name == command.data.name))
@@ -108,6 +108,7 @@ export async function deployCommands() {
     spin = spinner(`(/) Reloading commands for ${guildCommands.size} guilds...`,"yellow")
     guildCommands.forEach(async (guildCmd, guildId: string) => {
         try {
+            console.log(guildCmd)
             const data = await rest.put(Routes.applicationGuildCommands(process.env.clientId, "" + guildId), {
                 body: guildCmd
             })

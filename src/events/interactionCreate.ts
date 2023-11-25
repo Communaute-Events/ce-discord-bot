@@ -7,21 +7,28 @@ export const event =  {
         if (!interaction.isChatInputCommand()) return;
         const command = interaction.client.commands.get(interaction.commandName)
         if (!command) {
-            logging(`No Command found with name "${interaction.commandName}"`, "error");
+            const rest = new REST().setToken(process.env.token)
+            try {
+                // This part deletes any leftover commands in a guild.
+                const guildCommands = await interaction.guild.commands.fetch()
+                const leftoverCommand = guildCommands.find(cmd => cmd.name == interaction.commandName)
+                rest.delete(Routes.applicationGuildCommand(process.env.clientId,interaction.guild.id,leftoverCommand.id))
+                    .then(()=> logging(`Deleted leftover command ${interaction.commandName} in guild "${interaction.guild.id}`,"minimal"))
+                    .catch(err => logging(`An error occured while deleting left-over command:\n${err}`,"error"))
+            } catch (error) {
+                logging("An error occured while deleting left-over command:\n" + error,"error")
+            }
+            interaction.reply({content: "Command is outdated. It cannot be used anymore."})
             return
         }
-
-        // Resets commands for the guild if it has leftover slash commands
-        // if ("guilds" in command && !interaction.client.commands.find(cmd => {
-        //     return cmd.guilds && cmd.guilds.includes(interaction.guild.id)
-        // })) {
-        //     const rest = new REST().setToken(process.env.token);
-        //     const data = await rest.put(Routes.applicationGuildCommands(process.env.clientId, interaction.guildId), {
-        //         body: []
-        //     })
-        //     interaction.reply({content: "The slash command you just used doesn't exist anymore.", ephemeral: true})
-        //     return
-        // }
+        if ("allowDms" in command && command.allowDms == false && interaction.inGuild() == false) {
+            interaction.reply({ content: "This command is not available in **DMs**.", ephemeral: true})
+            return
+        }
+        if ("allowGuilds" in command && command.allowGuilds == false && interaction.inGuild() == true) {
+            interaction.reply({ content: "This command is not available in **Guilds**.", ephemeral: true})
+            return
+        }
 
         try {
             await command.execute(interaction)
