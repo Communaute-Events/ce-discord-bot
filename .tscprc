@@ -1,5 +1,5 @@
 {
   "ignored_files": ["README.md","tsconfig.json",".vscode",".gitignore",".tscprc",".git","dist"],
-  "compiled_files": ["**/*.ts", "**/*.tsx", "**/*.jsx"],
+  "compiled_files": ["**/*.ts", "**/*.tsx", "**/*.jsx","**/*.md"],
   "use_ts_exclude": true
 }
