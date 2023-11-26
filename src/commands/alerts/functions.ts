@@ -186,7 +186,7 @@ export async function info(interaction: ChatInputCommandInteraction) {
                 
                 **Actif**: ${serverInfo.enabled ? '✅' : '🚫'}
                 **Channel**: ${serverInfo.channel ? '<#' + serverInfo.channel + '>' : '`Non défini`'}
-                **Role(s)**: ${serverInfo.roles ? '<@&' + serverInfo.roles.join(">, <@&") + ">" : "@here"}
+                **Role(s)**: ${serverInfo.roles ? '<@&' + serverInfo.roles.join(">, <@&") + ">" : "@everyone"}
                 **Serveurs Évents**: ${serverInfo.sources ? "**" + serverInfo.sources
                         .map((src) => sources.find((s) => s.guildId === src)?.name)
                         .join("**, **") + "**" : '`Aucun`'}`
