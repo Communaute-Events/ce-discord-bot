@@ -3,7 +3,7 @@ import "@core/globals"
 import 'dotenv/config'
 
 // File imports
-import { ansi, spinner, logging } from "@core/utilities"
+import { ansi, logging } from "@core/utilities"
 import { deployCommands, getCommands } from "@core/deploy-commands"
 import { initEvents } from "./core/events"
 import { alert } from "./alerts/hander"
@@ -19,9 +19,8 @@ const client = new Client({intents: [GatewayIntentBits.Guilds]});
     client.commands = await getCommands()
 })()
 
-let spin = spinner("Initializing Client","yellow").start()
 client.once(Events.ClientReady, async(c) => {
-    spin.stop()
+    logging("Init. Client...","info")
 	logging(ansi(`Logged in as %bold%${c.user.tag}%end%%light_green%!%end%`),"success");
     logging(`Initalizing Events...`,"info")
     await initEvents(c)

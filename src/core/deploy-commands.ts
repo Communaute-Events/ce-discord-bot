@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import path from 'path';
 import { SlashCommandBuilder, REST, Routes, Collection, Snowflake } from 'discord.js';
-import { ansi, logging, spinner } from './utilities';
+import { ansi, logging } from './utilities';
 const loggingConfig = loadYaml("bot/logging.yml")
 
 interface Command {
@@ -65,15 +65,12 @@ export async function getCommands() {
 
 export async function deployCommands() {
     const rest = new REST().setToken(process.env.token);
-    let spin = spinner("Clearing global commands cache...", "blue")
     try {
         await rest.put(Routes.applicationCommands(process.env.clientId), {
             body: []
         })
-        spin.stop()
         logging("Cleared global commands cache!", "success")
     } catch (error) {
-        spin.stop()
         logging("An error occured when trying to clear the global commands cache\n" + error, "error")
     }
 
@@ -105,7 +102,6 @@ export async function deployCommands() {
         }
     }
     // Reload guild commands
-    spin = spinner(`(/) Reloading commands for ${guildCommands.size} guilds...`,"yellow")
     guildCommands.forEach(async (guildCmd, guildId: string) => {
         try {
             console.log(guildCmd)
@@ -113,24 +109,18 @@ export async function deployCommands() {
                 body: guildCmd
             })
         } catch (error) {
-            spin.clear()
             logging(`(/) Exception occured while refreshing commands for "${guildId}":\n${error}`, "error")
-            spin.render()
         }
     })
-    spin.stop()
     logging(`(/) Reloaded guild-specific commands for ${guildCommands.size} guilds.`,"success")
 
     // Reload global commands
-    spin = spinner(`(/) Reloading ${globalCommands.length} global commands`, "yellow")
     try {
         const data = await rest.put(Routes.applicationCommands(process.env.clientId), {
             body: globalCommands
         })
-        spin.stop()
         logging(`(/) Reloaded ${globalCommands.length} global commands`, "success")
     } catch (error) {
-        spin.stop()
         logging(`(/) Exception occured while reloading the global commands:\n${error}`, "error")
     }
 }

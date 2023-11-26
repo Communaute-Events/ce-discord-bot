@@ -1,5 +1,3 @@
-import ora from "ora"
-import { Color, Ora } from "ora"
 import { Console } from "console"
 import path from "path"
 import fs from "fs"
@@ -61,33 +59,6 @@ export const ansi = (inputString) =>
   inputString.replace(/%([^%]+)%/g, (match, colorName) =>
     colors[colorName.toLowerCase()] ? colors[colorName.toLowerCase()] : match
   );
-
-export function spinner(text: string, color: Color): Ora {
-  const spin = ora({ text: text })
-  spin.color = color
-  spin.spinner = {
-    interval: 80,
-    frames: [
-      "[    ]",
-      "[=   ]",
-      "[==  ]",
-      "[=== ]",
-      "[====]",
-      "[ ===]",
-      "[  ==]",
-      "[   =]",
-      "[    ]",
-      "[   =]",
-      "[  ==]",
-      "[ ===]",
-      "[====]",
-      "[=== ]",
-      "[==  ]",
-      "[=   ]"
-    ]
-  }
-  return spin
-}
 
 type LoggingType =
   | "info"
