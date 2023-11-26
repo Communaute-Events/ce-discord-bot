@@ -13,7 +13,16 @@ export default {
 			.setThumbnail("attachment://question_mark.png")
 			.setDescription("Voici une liste des actions proposées par **Event Helper**.")
 			.setFields(
-				{ name: "Commandes", value: '**/help**: Affiche ce menu\n' }
+				{ name: "Commandes", value:
+				`**/help**: Affiche ce menu
+				**/ping**: Répond avec la latence (en ms) du bot` },
+				{ name: "Commandes Admin", value: 
+				`**/alerts enable**: Active les alertes
+				**/alerts disable**: Désactive les alertes
+				**/alerts setchannel**: Défini le channel dans lequel envoyer les alertes
+				**/alerts pick**: Menu pour choisir quels serveurs d'events doivent être annoncé
+				**/alerts roles add**: Ajoute un rôle à ping
+				**/alerts roles remove**: Retire un rôle à ping` }
 			)
 		await interaction.reply({embeds: [embed], files: [new AttachmentBuilder("src/images/question_mark.png")]});
 	}

@@ -21,6 +21,7 @@ export async function alert(data: EventAlert, client: Client) {
     // Sends in each server
     servers.forEach(async server => {
         if (!server.sources.includes(data.guild.id)) return
+        if (!server.channel) return
         const channel = await client.channels.fetch(server.channel)
         if (!channel.isTextBased()) return
         const embed = new EmbedBuilder()
