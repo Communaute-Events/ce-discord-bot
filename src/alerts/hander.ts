@@ -25,7 +25,7 @@ export async function alert(data: EventAlert, client: Client) {
         if (!channel.isTextBased()) return
         const embed = new EmbedBuilder()
             .setTitle(`Nouvel Event - ${data.eventSource.name}`)
-            .setDescription(`Un event a été détecté sur le serveur discord "${data.eventSource.name}". Pour plus d'informations, rendez-vous ci-dessous.`)
+            .setDescription(`Un event a été détecté sur le serveur discord "${data.eventSource.name}". Pour plus d'informations, rendez-vous ci-dessous.\n\n`)
             .setFields({name: "Contenu du message", value: data.message.data.content})
             .setColor(BotInfo.Color)
             .setThumbnail(data.guild.iconUrl)
@@ -37,6 +37,6 @@ export async function alert(data: EventAlert, client: Client) {
             .setLabel("Aller à l'annonce")
         const row = new ActionRowBuilder<ButtonBuilder>()
             .addComponents(button)
-        channel.send({content: server.roles.map(role => `<@&${role}>`).join(" "),embeds: [embed], components: [row]})
+        channel.send({content: server.roles ? server.roles.map(role => `<@&${role}>`).join(" ") : "@here",embeds: [embed], components: [row]})
     })
 }
