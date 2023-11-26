@@ -38,6 +38,10 @@ export async function alert(data: EventAlert, client: Client) {
             .setLabel("Aller à l'annonce")
         const row = new ActionRowBuilder<ButtonBuilder>()
             .addComponents(button)
-        channel.send({content: server.roles ? server.roles.map(role => `<@&${role}>`).join(" ") : "@here",embeds: [embed], components: [row]})
+        try {
+            channel.send({content: server.roles ? server.roles.map(role => `<@&${role}>`).join(" ") : "@here",embeds: [embed], components: [row]})
+        } catch (err) {
+            // Missing permissions in channel
+        }
     })
 }
