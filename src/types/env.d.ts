@@ -5,6 +5,8 @@ declare global {
     interface ProcessEnv {
         token: string,
         clientId: any,
+        mongoUri: string,
+        socketUrl: string
     }
   }
 }
