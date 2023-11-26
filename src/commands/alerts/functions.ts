@@ -161,3 +161,44 @@ export async function roles(interaction: ChatInputCommandInteraction, operation:
         }
     }
 }
+
+export async function info(interaction: ChatInputCommandInteraction) {
+    try {
+        mongo.connect()
+        const db: Db = mongo.db("discord")
+        const collection: Collection = db.collection("servers")
+        const serverInfo: DiscordServerInfo = await collection.findOne({ id: interaction.guild.id })
+
+        const sources: EventSource[] = await fetch("https://raw.githubusercontent.com/Communaute-Events/paths/main/paths.json", {
+            method: "GET",
+            headers: { "Content-Type": "application/json" }
+        }).then(res => res.json().then(async (res) => {
+            return (await fetch(res.sources, { method: "GET", headers: { "Content-Type": "application/json" } })).json()
+        })).catch(err => {
+            interaction.reply(`An error occured! \`(${interaction.createdTimestamp})\``)
+            logging(`An error occured while fetching event sources:\n${err}`, "error")
+        })
+
+        const embed = new EmbedBuilder()
+            .setTitle("Paramètres des Alertes")
+            .setDescription(
+                `Voici les paramètres actuels des alertes:
+                
+                **Actif**: ${serverInfo.enabled ? '✅' : '🚫'}
+                **Channel**: ${serverInfo.channel ? '<#' + serverInfo.channel + '>' : '`Non défini`'}
+                **Role(s)**: ${serverInfo.roles ? '<@&' + serverInfo.roles.join(">, <@&") + ">" : "@here"}
+                **Serveurs Évents**: ${serverInfo.sources ? "**" + serverInfo.sources
+                        .map((src) => sources.find((s) => s.guildId === src)?.name)
+                        .join("**, **") + "**" : '`Aucun`'}`
+                )
+            .setColor(BotInfo.Color)
+            .setThumbnail(interaction.guild.iconURL())
+            .setTimestamp()
+        interaction.reply({embeds: [embed]})
+    } catch (err) {
+        interaction.reply({content: "An error occured",ephemeral: true})
+        logging(`Error occured while sending alerts info:\n${err}`,"error")
+    } finally {
+        mongo.close()
+    }
+} 

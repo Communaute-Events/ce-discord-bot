@@ -1,6 +1,6 @@
 // @command
 import { SlashCommandBuilder, ChannelType, PermissionFlagsBits, ChatInputCommandInteraction } from 'discord.js'
-import { changeState, setChannel, pickSource, roles } from './functions';
+import { changeState, setChannel, pickSource, roles, info } from './functions';
 
 export default {
     data: new SlashCommandBuilder()
@@ -57,6 +57,11 @@ export default {
                                 .setDescription("Le rôle à supprimer")
                         )
                 )
+        )
+        .addSubcommand(subcommand =>
+            subcommand
+                .setName("info")    
+                .setDescription("Montre les paramètres des alertes.")
         ),
     async execute(interaction: ChatInputCommandInteraction) {
         switch (interaction.options.getSubcommandGroup()) {
@@ -65,6 +70,7 @@ export default {
                 case "enable": changeState(interaction, true); break;
                 case "disable": changeState(interaction, false); break;
                 case "pick": pickSource(interaction); break;
+                case "info": info(interaction); break;
             }
             case "roles": switch (interaction.options.getSubcommand()) {
                 case "add": roles(interaction,true); break;
