@@ -1,6 +1,7 @@
 // @command
-import { SlashCommandBuilder, ChannelType, PermissionFlagsBits, ChatInputCommandInteraction } from 'discord.js'
-import { changeState, setChannel, pickSource, roles, info } from './functions';
+import { SlashCommandBuilder, ChannelType, PermissionFlagsBits, ChatInputCommandInteraction, AutocompleteInteraction } from 'discord.js'
+import { changeState, setChannel, pickSource, roles, info, getSources } from './functions';
+import { EventSource } from '@src/types';
 
 export default {
     data: new SlashCommandBuilder()
@@ -57,6 +58,22 @@ export default {
                                 .setDescription("Le rôle à supprimer")
                         )
                 )
+                .addSubcommand(subcommand =>
+                    subcommand
+                        .setName("bind")
+                        .setDescription("Défini un rôle à ping pour un certain event.")
+                        .addRoleOption(option =>
+                            option
+                                .setName("role")
+                                .setDescription("Le rôle à attacher")
+                        )
+                        .addStringOption(option =>
+                            option
+                                .setName("event")
+                                .setDescription("La source de l'event")
+                                .setAutocomplete(true)
+                        )
+                )
         )
         .addSubcommand(subcommand =>
             subcommand
@@ -78,5 +95,13 @@ export default {
             }
         }
 
+    },
+    async autocomplete(interaction: AutocompleteInteraction) {
+        const focusedOption = interaction.options.getFocused(true)
+        const choices = (await getSources()).map(src => src.name)
+        const filtered = choices.filter(choice => choice.startsWith(focusedOption.value));
+        await interaction.respond(
+            filtered.map(choice => ({ name: choice, value: choice}))
+        )
     }
 };

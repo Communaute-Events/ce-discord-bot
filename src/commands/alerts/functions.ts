@@ -15,6 +15,17 @@ const mongo = new MongoClient(process.env.mongoUri, {
     }
 });
 
+export async function getSources(): Promise<EventSource[]> {
+    return await fetch("https://raw.githubusercontent.com/Communaute-Events/paths/main/paths.json", {
+            method: "GET",
+            headers: { "Content-Type": "application/json" }
+        }).then(res => res.json().then(async (res) => {
+            return (await fetch(res.sources, { method: "GET", headers: { "Content-Type": "application/json" } })).json()
+        })).catch(err => {
+            logging(`An error occured while fetching event sources:\n${err}`, "error")
+        })
+}
+
 export async function setChannel(interaction: ChatInputCommandInteraction) {
     try {
         await mongo.connect()
@@ -76,15 +87,7 @@ export async function pickSource(interaction: ChatInputCommandInteraction) {
         const collection: Collection = db.collection("servers")
         const savedSources: any[] = (await collection.findOne({ id: interaction.guild.id })).sources || []
 
-        const sources: EventSource[] = await fetch("https://raw.githubusercontent.com/Communaute-Events/paths/main/paths.json", {
-            method: "GET",
-            headers: { "Content-Type": "application/json" }
-        }).then(res => res.json().then(async (res) => {
-            return (await fetch(res.sources, { method: "GET", headers: { "Content-Type": "application/json" } })).json()
-        })).catch(err => {
-            interaction.reply(`An error occured! \`(${interaction.createdTimestamp})\``)
-            logging(`An error occured while fetching event sources:\n${err}`, "error")
-        })
+        const sources: EventSource[] = await getSources()
 
         const regex = emojiRegex()
         const select = new StringSelectMenuBuilder()
@@ -169,15 +172,7 @@ export async function info(interaction: ChatInputCommandInteraction) {
         const collection: Collection = db.collection("servers")
         const serverInfo: DiscordServerInfo = await collection.findOne({ id: interaction.guild.id })
 
-        const sources: EventSource[] = await fetch("https://raw.githubusercontent.com/Communaute-Events/paths/main/paths.json", {
-            method: "GET",
-            headers: { "Content-Type": "application/json" }
-        }).then(res => res.json().then(async (res) => {
-            return (await fetch(res.sources, { method: "GET", headers: { "Content-Type": "application/json" } })).json()
-        })).catch(err => {
-            interaction.reply(`An error occured! \`(${interaction.createdTimestamp})\``)
-            logging(`An error occured while fetching event sources:\n${err}`, "error")
-        })
+        const sources: EventSource[] = await getSources()
 
         const embed = new EmbedBuilder()
             .setTitle("Paramètres des Alertes")

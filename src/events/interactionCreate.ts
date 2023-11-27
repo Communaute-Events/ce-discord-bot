@@ -31,6 +31,14 @@ export const event =  {
         }
 
         try {
+            if (interaction.isAutocomplete()) {
+                if (!("autocomplete" in command)) {
+                    logging(`No 'autocomplete' function found in the command "${command.name}"`,"error")
+                    return
+                }
+                await command.autocomplete()
+                return
+            }
             await command.execute(interaction)
             logging(`${interaction.user.globalName} executed the command "${interaction.commandName}" in guild "${interaction.guildId}" at "${new Date().toLocaleString()}"`,"minimal",false)
         } catch (error) {
