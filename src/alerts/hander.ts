@@ -33,12 +33,11 @@ export async function alert(data: EventAlert, client: Client) {
         if (!channel.isTextBased()) return
         const embed = new EmbedBuilder()
             .setTitle(`Nouvel Event -    ${data.eventSource.name}`)
-            .setDescription(`Un event a été détecté sur le serveur discord "${data.eventSource.name}". Pour plus d'informations, rendez-vous ci-dessous.\n\n`)
+            .setDescription(`Un event a été détecté sur le serveur discord __"${data.eventSource.name}"__. Pour plus d'informations, rendez-vous ci-dessous.\n\n`)
             .setFields({ name: "Contenu du message", value: data.message.data.content })
             .setColor(BotInfo.Color)
             .setThumbnail(data.guild.iconUrl)
             .setTimestamp()
-            .setFooter({ text: "By Communauté Events - https://github.com/communaute-events" })
         const button = new ButtonBuilder()
             .setStyle(ButtonStyle.Link)
             .setURL(data.message.url)
@@ -46,8 +45,9 @@ export async function alert(data: EventAlert, client: Client) {
         const row = new ActionRowBuilder<ButtonBuilder>()
             .addComponents(button)
         try {
-            const formattedStrings: string[] = Object.values(server.roles).map((roleId) => `<@&${roleId}>`);
-            const formattedString: string = formattedStrings.join(', ');
+            const formattedString: string = `<@&${server.roles[data.eventSource.guildId]}>`
+            // const formattedStrings: string[] = Object.values(server.roles).map((roleId) => `<@&${roleId}>`);
+            // const formattedString: string = formattedStrings.join(', ');
             channel.send({ content: server.roles ? formattedString : "@here", embeds: [embed], components: [row] })
         } catch (err) {
             // Missing permissions in channel
