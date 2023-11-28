@@ -36,17 +36,6 @@ export default {
             subcommand
                 .setName("roles")
                 .setDescription("Séléctionne les rôles à ping lors d'un event.")
-                // .addSubcommand(subcommand =>
-                //     subcommand
-                //         .setName("add")
-                //         .setDescription("Ajoute le rôle séléctionné")
-                //         .addRoleOption(option =>
-                //             option
-                //                 .setRequired(true)
-                //                 .setName("role")
-                //                 .setDescription("Le rôle à ajouter")
-                //         )
-                // )
                 .addSubcommand(subcommand =>
                     subcommand
                         .setName("unbind")

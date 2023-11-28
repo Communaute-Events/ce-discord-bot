@@ -137,50 +137,26 @@ export async function pickSource(interaction: ChatInputCommandInteraction) {
     }
 }
 
-// export async function roles(interaction: ChatInputCommandInteraction, operation: boolean) {
-//     const roleId = interaction.options.getRole("role").id
-//     try {
-//         await mongo.connect()
-//         const db: Db = mongo.db("discord")
-//         const collection: Collection = db.collection("servers")
-
-//         let roles: string[] = (await collection.findOne({ id: interaction.guild.id })).roles || []
-//         if (operation) {
-//             roles.push(roleId)
-//         } else {
-//             roles = roles.filter(role => role !== roleId)
-//         }
-//         await collection.updateOne(
-//             { id: interaction.guild.id },
-//             { $set: { roles: [...new Set(roles)] } },
-//             { upsert: true }
-//         )
-//         interaction.reply({ content: operation ? `<@&${roleId}> a été **ajouté** à la liste des rôles.` : `<@&${roleId}> a été **retiré** à la liste des rôles.`, ephemeral: true })
-//     } catch (error) {
-//         logging(`Error occured while updating guild ping roles:\n${error}`, "error")
-//     } finally {
-//         if (mongo) {
-//             await mongo.close()
-//         }
-//     }
-// }
-
 export async function info(interaction: ChatInputCommandInteraction) {
     try {
         await mongo.connect()
         const db: Db = mongo.db("discord")
         const collection: Collection = db.collection("servers")
         const serverInfo: DiscordServerInfo = await collection.findOne({ id: interaction.guild.id })
+        if (!serverInfo) {
+            interaction.reply({content: "Aucune configuration n'a été trouvée pour le serveur.",ephemeral: true})
+            return
+        }
 
         const sources: EventSource[] = await getSources()
 
-        const formattedString: string = Object.entries(serverInfo.roles)
+        const formattedString: string = serverInfo.roles ? Object.entries(serverInfo.roles)
             .map(([id, roleId]) => {
                 const user = sources.find((src) => src.guildId === id);
                 const userName = user ? user.name : id;
                 return `\n> \`${userName}\`: <@&${roleId}>`;
             })
-            .join(', ');
+            .join(', ') : '@everyone';
 
         const embed = new EmbedBuilder()
             .setTitle("Paramètres des Alertes")
@@ -189,7 +165,7 @@ export async function info(interaction: ChatInputCommandInteraction) {
                 
                 **Actif**: ${serverInfo.enabled ? '✅' : '🚫'}
                 **Channel**: ${serverInfo.channel ? '<#' + serverInfo.channel + '>' : '`Non défini`'}
-                **Role(s)**: ${serverInfo.roles ? formattedString : "@everyone"}
+                **Role(s)**: ${formattedString}
                 **Serveurs Évents Actifs**: ${serverInfo.sources ? "\n*" + serverInfo.sources
                     .map((src) => sources.find((s) => s.guildId === src)?.name)
                     .join("*\n*") + "*" : '`Aucun`'}`
