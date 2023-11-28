@@ -1,6 +1,6 @@
 // @command
 import { SlashCommandBuilder, ChannelType, PermissionFlagsBits, ChatInputCommandInteraction, AutocompleteInteraction } from 'discord.js'
-import { changeState, setChannel, pickSource, roles, info, getSources } from './functions';
+import { changeState, setChannel, pickSource, info, getSources, bind } from './functions';
 import { EventSource } from '@src/types';
 
 export default {
@@ -36,26 +36,26 @@ export default {
             subcommand
                 .setName("roles")
                 .setDescription("Séléctionne les rôles à ping lors d'un event.")
+                // .addSubcommand(subcommand =>
+                //     subcommand
+                //         .setName("add")
+                //         .setDescription("Ajoute le rôle séléctionné")
+                //         .addRoleOption(option =>
+                //             option
+                //                 .setRequired(true)
+                //                 .setName("role")
+                //                 .setDescription("Le rôle à ajouter")
+                //         )
+                // )
                 .addSubcommand(subcommand =>
                     subcommand
-                        .setName("add")
-                        .setDescription("Ajoute le rôle séléctionné")
+                        .setName("unbind")
+                        .setDescription("Retire un rôle à ping pour un certain event.")
                         .addRoleOption(option =>
                             option
-                                .setRequired(true)
                                 .setName("role")
-                                .setDescription("Le rôle à ajouter")
-                        )
-                )
-                .addSubcommand(subcommand =>
-                    subcommand
-                        .setName("remove")
-                        .setDescription("Retire le rôle séléctionné.")
-                        .addRoleOption(option =>
-                            option
+                                .setDescription("Le rôle à détacher")
                                 .setRequired(true)
-                                .setName("role")
-                                .setDescription("Le rôle à supprimer")
                         )
                 )
                 .addSubcommand(subcommand =>
@@ -66,18 +66,20 @@ export default {
                             option
                                 .setName("role")
                                 .setDescription("Le rôle à attacher")
+                                .setRequired(true)
                         )
                         .addStringOption(option =>
                             option
                                 .setName("event")
                                 .setDescription("La source de l'event")
                                 .setAutocomplete(true)
+                                .setRequired(true)
                         )
                 )
         )
         .addSubcommand(subcommand =>
             subcommand
-                .setName("info")    
+                .setName("info")
                 .setDescription("Montre les paramètres des alertes.")
         ),
     async execute(interaction: ChatInputCommandInteraction) {
@@ -90,18 +92,18 @@ export default {
                 case "info": info(interaction); break;
             }
             case "roles": switch (interaction.options.getSubcommand()) {
-                case "add": roles(interaction,true); break;
-                case "remove": roles(interaction,false); break;
+                // case "add": roles(interaction,true); break;
+                // case "remove": roles(interaction,false); break;
+                case "bind": bind(interaction, true); break;
+                case "unbind": bind(interaction, false); break;
             }
         }
 
     },
     async autocomplete(interaction: AutocompleteInteraction) {
         const focusedOption = interaction.options.getFocused(true)
-        const choices = (await getSources()).map(src => src.name)
-        const filtered = choices.filter(choice => choice.startsWith(focusedOption.value));
-        await interaction.respond(
-            filtered.map(choice => ({ name: choice, value: choice}))
-        )
+        const choices = (await getSources()).map(src => ({ name: src.name, value: src.guildId }))
+        const filtered = choices.filter(choice => choice.name.toLowerCase().startsWith(focusedOption.value.toLowerCase()));
+        await interaction.respond(filtered)
     }
 };

@@ -20,5 +20,5 @@ export interface DiscordServerInfo {
     channel?: string,
     enabled?: boolean,
     sources?: string[],
-    roles?: string[]
+    roles?: { [id: string]: string}
 }

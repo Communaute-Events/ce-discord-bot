@@ -17,13 +17,13 @@ const mongo = new MongoClient(process.env.mongoUri, {
 
 export async function getSources(): Promise<EventSource[]> {
     return await fetch("https://raw.githubusercontent.com/Communaute-Events/paths/main/paths.json", {
-            method: "GET",
-            headers: { "Content-Type": "application/json" }
-        }).then(res => res.json().then(async (res) => {
-            return (await fetch(res.sources, { method: "GET", headers: { "Content-Type": "application/json" } })).json()
-        })).catch(err => {
-            logging(`An error occured while fetching event sources:\n${err}`, "error")
-        })
+        method: "GET",
+        headers: { "Content-Type": "application/json" }
+    }).then(res => res.json().then(async (res) => {
+        return (await fetch(res.sources, { method: "GET", headers: { "Content-Type": "application/json" } })).json()
+    })).catch(err => {
+        logging(`An error occured while fetching event sources:\n${err}`, "error")
+    })
 }
 
 export async function setChannel(interaction: ChatInputCommandInteraction) {
@@ -137,42 +137,50 @@ export async function pickSource(interaction: ChatInputCommandInteraction) {
     }
 }
 
-export async function roles(interaction: ChatInputCommandInteraction, operation: boolean) {
-    const roleId = interaction.options.getRole("role").id
-    try {
-        await mongo.connect()
-        const db: Db = mongo.db("discord")
-        const collection: Collection = db.collection("servers")
+// export async function roles(interaction: ChatInputCommandInteraction, operation: boolean) {
+//     const roleId = interaction.options.getRole("role").id
+//     try {
+//         await mongo.connect()
+//         const db: Db = mongo.db("discord")
+//         const collection: Collection = db.collection("servers")
 
-        let roles: string[] = (await collection.findOne({ id: interaction.guild.id })).roles || []
-        if (operation) {
-            roles.push(roleId)
-        } else {
-            roles = roles.filter(role => role !== roleId)
-        }
-        await collection.updateOne(
-            { id: interaction.guild.id },
-            { $set: { roles: [...new Set(roles)] } },
-            { upsert: true }
-        )
-        interaction.reply({content: operation ? `<@&${roleId}> a été **ajouté** à la liste des rôles.` : `<@&${roleId}> a été **retiré** à la liste des rôles.`,ephemeral: true})
-    } catch (error) {
-        logging(`Error occured while updating guild ping roles:\n${error}`, "error")
-    } finally {
-        if (mongo) {
-            await mongo.close()
-        }
-    }
-}
+//         let roles: string[] = (await collection.findOne({ id: interaction.guild.id })).roles || []
+//         if (operation) {
+//             roles.push(roleId)
+//         } else {
+//             roles = roles.filter(role => role !== roleId)
+//         }
+//         await collection.updateOne(
+//             { id: interaction.guild.id },
+//             { $set: { roles: [...new Set(roles)] } },
+//             { upsert: true }
+//         )
+//         interaction.reply({ content: operation ? `<@&${roleId}> a été **ajouté** à la liste des rôles.` : `<@&${roleId}> a été **retiré** à la liste des rôles.`, ephemeral: true })
+//     } catch (error) {
+//         logging(`Error occured while updating guild ping roles:\n${error}`, "error")
+//     } finally {
+//         if (mongo) {
+//             await mongo.close()
+//         }
+//     }
+// }
 
 export async function info(interaction: ChatInputCommandInteraction) {
     try {
-        mongo.connect()
+        await mongo.connect()
         const db: Db = mongo.db("discord")
         const collection: Collection = db.collection("servers")
         const serverInfo: DiscordServerInfo = await collection.findOne({ id: interaction.guild.id })
 
         const sources: EventSource[] = await getSources()
+
+        const formattedString: string = Object.entries(serverInfo.roles)
+            .map(([id, roleId]) => {
+                const user = sources.find((src) => src.guildId === id);
+                const userName = user ? user.name : id;
+                return `\n> \`${userName}\`: <@&${roleId}>`;
+            })
+            .join(', ');
 
         const embed = new EmbedBuilder()
             .setTitle("Paramètres des Alertes")
@@ -181,19 +189,78 @@ export async function info(interaction: ChatInputCommandInteraction) {
                 
                 **Actif**: ${serverInfo.enabled ? '✅' : '🚫'}
                 **Channel**: ${serverInfo.channel ? '<#' + serverInfo.channel + '>' : '`Non défini`'}
-                **Role(s)**: ${serverInfo.roles ? '<@&' + serverInfo.roles.join(">, <@&") + ">" : "@everyone"}
-                **Serveurs Évents**: ${serverInfo.sources ? "**" + serverInfo.sources
-                        .map((src) => sources.find((s) => s.guildId === src)?.name)
-                        .join("**, **") + "**" : '`Aucun`'}`
-                )
+                **Role(s)**: ${serverInfo.roles ? formattedString : "@everyone"}
+                **Serveurs Évents Actifs**: ${serverInfo.sources ? "\n*" + serverInfo.sources
+                    .map((src) => sources.find((s) => s.guildId === src)?.name)
+                    .join("*\n*") + "*" : '`Aucun`'}`
+            )
             .setColor(BotInfo.Color)
             .setThumbnail(interaction.guild.iconURL())
             .setTimestamp()
-        interaction.reply({embeds: [embed]})
+        interaction.reply({ embeds: [embed] })
     } catch (err) {
-        interaction.reply({content: "An error occured",ephemeral: true})
-        logging(`Error occured while sending alerts info:\n${err}`,"error")
+        interaction.reply({ content: "An error occured", ephemeral: true })
+        logging(`Error occured while sending alerts info:\n${err}`, "error")
     } finally {
-        mongo.close()
+        await mongo.close()
     }
-} 
+}
+
+export async function bind(interaction: ChatInputCommandInteraction, operation: boolean) {
+    try {
+        await mongo.connect()
+        const db: Db = mongo.db("discord")
+        const collection: Collection = db.collection("servers")
+        const serverInfo: DiscordServerInfo = await collection.findOne({ id: interaction.guild.id })
+        let roles: { [id: string]: string } = serverInfo.roles || {}
+        const embed = new EmbedBuilder()
+            .setColor(BotInfo.Color)
+        const sources = await getSources()
+        const role = interaction.options.getRole("role")
+
+        if (operation) {
+            if (!sources.find(src => src.guildId == interaction.options.getString("event"))) {
+                interaction.reply({ content: "La source d'évent donnée n'existe pas.", ephemeral: true })
+                return
+            }
+            const src = sources.find(src => src.guildId == interaction.options.getString("event"))
+
+            roles[src.guildId] = role.id
+            await collection.updateOne(
+                { id: interaction.guild.id },
+                { $set: { roles: roles } },
+                { upsert: true }
+            )
+            embed
+                .setTitle("Rôle séléctionné")
+                .setDescription(`Le rôle <@&${role.id}> va maintenant être ping pour les annonces de **${src.name}**.`)
+        } else {
+            const deletedSrcs: string[] = []
+            Object.keys(roles).forEach(key => {
+                if (roles[key] === role.id) {
+                    deletedSrcs.push(sources.find(src => src.guildId === key).name)
+                    delete roles[key]
+                }
+            })
+            embed
+                .setTitle("Rôle dé-séléctionné")
+                .setDescription(`Le rôle <@&${role.id}> a été retiré de:\n> \`${deletedSrcs.join("`\n> ")}\`.`)
+        }
+
+        await collection.updateOne(
+            { id: interaction.guild.id },
+            { $set: { roles: roles } },
+            { upsert: true }
+        )
+        interaction.reply({ embeds: [embed], ephemeral: true })
+
+
+    } catch (err) {
+        logging(`Error occured in the "bind" command:\n${err}`, "error")
+        interaction.reply({ content: "An error occured.", ephemeral: true })
+    } finally {
+        if (mongo) {
+            await mongo.close()
+        }
+    }
+}
