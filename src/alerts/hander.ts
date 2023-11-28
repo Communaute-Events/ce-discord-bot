@@ -20,6 +20,7 @@ export async function alert(data: EventAlert, client: Client) {
     const servers: DiscordServerInfo[] = await collection.find({ enabled: true }).toArray()
     // Sends in each server
     servers.forEach(async server => {
+        if (!server.sources) return
         if (!server.sources.includes(data.guild.id)) return
         if (!server.channel) return
         let channel: Channel;
