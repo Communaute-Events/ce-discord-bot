@@ -1,0 +1,26 @@
+Commands:
+  - name: "Aide"
+    command: "help"
+    description: "Affiche ce menu"
+  - name: "Latence"
+    command: "ping"
+    description: "Répond avec la latence en ms du bot"
+
+Admin Commands:
+  - name: "Alertes"
+    command: "alert"
+    category: true
+    description: "Gère les alertes d'évents du serveur"
+    subcommands:
+      - command: "info"
+        description: "Affiche des informations à propos de la configuration des alertes"
+      - command: "enable"
+        description: "Active les alertes d'évents"
+      - command: "disable"
+        description: "Désactive les alertes d'évents"
+      - command: "setchannel"
+        description: "Défini le channel d'alerte pour les évents"
+      - command: "pick"
+        description: "Active/Désactive certain serveurs d'évents"
+      - command: "roles bind"
+        description: "Permet de définir le rôle à ping pour un certain event"

@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node scripts/start.js && npm run build && cd dist && node src/index.js",
     "build": "rimraf dist/* && tsc && tsc-alias && tscp",
-    "build:watch": "tsc && tscp && (concurrently \"tsc -w\" \"tsc-alias -w\")",
+    "build:watch": "tsc -c && tscp && (concurrently \"tsc -w\" \"tsc-alias -w\")",
     "watch": "npm run build:watch",
     "url": "node scripts/url.js"
   },
