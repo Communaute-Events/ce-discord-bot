@@ -1,9 +1,14 @@
 import { logging } from "@src/core/utilities";
+import { autocomplete } from "@src/interactions/autocomplete";
 import { CommandInteraction, REST, Routes } from "discord.js";
 
 export const event =  {
     name: "interactionCreate",
     async execute(interaction: CommandInteraction) {
+        if (interaction.isAutocomplete()) {
+            await autocomplete(interaction)
+            return
+        }
         if (!interaction.isChatInputCommand()) return;
         const command = interaction.client.commands.get(interaction.commandName)
         if (!command) {
@@ -31,14 +36,6 @@ export const event =  {
         }
 
         try {
-            if (interaction.isAutocomplete()) {
-                if (!("autocomplete" in command)) {
-                    logging(`No 'autocomplete' function found in the command "${command.name}"`,"error")
-                    return
-                }
-                await command.autocomplete()
-                return
-            }
             await command.execute(interaction)
             logging(`${interaction.user.globalName} executed the command "${interaction.commandName}" in guild "${interaction.guildId}" at "${new Date().toLocaleString()}"`,"minimal",false)
         } catch (error) {
