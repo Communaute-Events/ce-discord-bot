@@ -9,27 +9,37 @@ import { initEvents } from "./core/events"
 import { alert } from "./alerts/hander"
 
 // Imports
-import { Client, Events, GatewayIntentBits } from "discord.js"
+import { Client, Events, GatewayIntentBits, messageLink } from "discord.js"
 import { WebSocket } from "ws"
 import fetch from "cross-fetch"
 
 // Main
-const client = new Client({intents: [GatewayIntentBits.Guilds]});
+const client = new Client({intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent]});
 (async()=>{
     client.commands = await getCommands()
 })()
 
-function checkWs(ws: WebSocket) {
-    if (ws.readyState != WebSocket.OPEN) {
-        logging(`WebSocket connection has been established. The bot is operational.`,"success")
-    } else {
-        setTimeout(checkWs,500)
-    }
-}
+// function checkWs(ws: WebSocket) {
+//     if (ws.readyState != WebSocket.OPEN) {
+//         logging(`WebSocket connection has been established. The bot is operational.`,"success")
+//     } else {
+//         setTimeout(checkWs,500)
+//     }
+// }
 
+let websockets: WebSocket[] = []
 let isReconnecting;
 
-async function wsConnect() {
+export function closeWebsockets() {
+    websockets.forEach(ws => {
+        const url = ws.url
+        ws.terminate()
+        logging(`Closed ws "${url}" at "${new Date().toISOString()}"`,"minimal")
+    })
+    websockets = []
+}
+
+export async function wsConnect() {
     function wsError(error) {
         if (isReconnecting) return
         isReconnecting = true
@@ -48,7 +58,8 @@ async function wsConnect() {
         const res = await response.json();
         const ws = new WebSocket(res.websocket)
 
-        checkWs(ws)
+        // checkWs(ws)
+        websockets.push(ws)
 
         ws.on("message", msg => {
             try {
@@ -68,6 +79,10 @@ async function wsConnect() {
         ws.on("error", error => {
             wsError(error)
         });
+
+        ws.on("open",()=> {
+            logging(`WebSocket connection has been established. The bot is operational.`,"success")
+        })
     } catch (error) {
         wsError({message: error})
     }
