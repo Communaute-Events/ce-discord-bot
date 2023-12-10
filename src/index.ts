@@ -39,7 +39,7 @@ export function closeWebsockets() {
     websockets = []
 }
 
-export async function wsConnect() {
+export async function wsConnect(): Promise<WebSocket> {
     function wsError(error) {
         if (isReconnecting) return
         isReconnecting = true
@@ -83,9 +83,26 @@ export async function wsConnect() {
         ws.on("open",()=> {
             logging(`WebSocket connection has been established. The bot is operational.`,"success")
         })
+        return ws
     } catch (error) {
         wsError({message: error})
     }
+}
+
+export async function reconnectWebsocket() {
+    logging("Reconnecting to the WebSocket...","info")
+    logging(`Closed all Websockets. (3 sec delay)`,"info")
+    closeWebsockets()
+    await setTimeout(()=>{},3000)
+    logging("Re-establishing connection...","info")
+    const ws = await wsConnect()
+    logging(`Connection should be up. Current state: ${ws.readyState}`,`success`)
+}
+
+async function automaticWsRestart() {
+    logging(`Automatically restarting websocket (10min interval)`,"info")
+    await reconnectWebsocket()
+    logging(`Finished automated restarting function.`,"success")
 }
 
 client.once(Events.ClientReady, async(c) => {
@@ -97,7 +114,8 @@ client.once(Events.ClientReady, async(c) => {
     await deployCommands()
     logging(`All slash commands have been deployed.`,"success")
     logging(`Connecting to the Event Websocket`,"info")
-    wsConnect()
+    await wsConnect()
+    setInterval(automaticWsRestart,600000)
 });
 
 // Login, needs to be at the bottom
