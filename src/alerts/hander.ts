@@ -12,7 +12,10 @@ const mongo = new MongoClient(process.env.mongoUri, {
     }
 });
 
+let doingAlert = false;
 export async function alert(data: EventAlert, client: Client) {
+    if (doingAlert) return
+    doingAlert = true
     await mongo.connect()
     const db: Db = mongo.db("discord")
     const collection = db.collection("servers")
@@ -53,4 +56,5 @@ export async function alert(data: EventAlert, client: Client) {
             // Missing permissions in channel
         }
     })
+    doingAlert = false
 }
