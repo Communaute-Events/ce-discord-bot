@@ -35,11 +35,13 @@ export async function alert(data: EventAlert, client: Client) {
         }
         if (!channel.isTextBased()) return
         const embed = new EmbedBuilder()
-            .setTitle(`Nouvel Event -    ${data.eventSource.name}`)
+            .setTitle(`Nouvel Event - ${data.eventSource.name}`)
             .setDescription(`Un event a été détecté sur le serveur discord __"${data.eventSource.name}"__. Pour plus d'informations, rendez-vous ci-dessous.\n\n`)
-            .setFields({ name: "Contenu du message", value: data.message.data.content })
             .setColor(BotInfo.Color)
             .setThumbnail(data.guild.iconUrl)
+        const embed2 = new EmbedBuilder()
+            .setDescription("Pour plus d'informations, rendez-vous à l'annonce.")
+            .setColor(BotInfo.Color)
             .setTimestamp()
         const button = new ButtonBuilder()
             .setStyle(ButtonStyle.Link)
@@ -51,7 +53,8 @@ export async function alert(data: EventAlert, client: Client) {
             const formattedString: string = `<@&${server.roles[data.eventSource.guildId]}>`
             // const formattedStrings: string[] = Object.values(server.roles).map((roleId) => `<@&${roleId}>`);
             // const formattedString: string = formattedStrings.join(', ');
-            channel.send({ content: server.roles ? formattedString : "@here", embeds: [embed], components: [row] })
+            channel.send({ content: server.roles ? formattedString : "@here", embeds: [embed] })
+            channel.send({ content: data.message.data.content.replace(/@/g, "`@`"), embeds: [embed2], components: [row] })
         } catch (err) {
             // Missing permissions in channel
         }
