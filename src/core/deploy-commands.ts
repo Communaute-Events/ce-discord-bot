@@ -104,7 +104,6 @@ export async function deployCommands() {
     // Reload guild commands
     guildCommands.forEach(async (guildCmd, guildId: string) => {
         try {
-            console.log(guildCmd)
             const data = await rest.put(Routes.applicationGuildCommands(process.env.clientId, "" + guildId), {
                 body: guildCmd
             })
