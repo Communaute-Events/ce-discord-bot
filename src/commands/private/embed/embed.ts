@@ -21,6 +21,7 @@ export default {
         try {
 		    const data: DiscoHook = JSON.parse(interaction.options.getString("embed"))
             await interaction.channel.send({content: data.content, embeds: data.embeds});
+            interaction.deferReply()
         } catch (error) {
             await interaction.reply("```" + error + "```")
         }
