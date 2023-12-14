@@ -108,7 +108,6 @@ export async function deployCommands() {
     spin = spinner(`(/) Reloading commands for ${guildCommands.size} guilds...`,"yellow")
     guildCommands.forEach(async (guildCmd, guildId: string) => {
         try {
-            console.log(guildCmd)
             const data = await rest.put(Routes.applicationGuildCommands(process.env.clientId, "" + guildId), {
                 body: guildCmd
             })
