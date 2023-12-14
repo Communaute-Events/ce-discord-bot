@@ -20,7 +20,7 @@ export default {
 	async execute(interaction: ChatInputCommandInteraction) {
         try {
 		    const data: DiscoHook = JSON.parse(interaction.options.getString("embed"))
-            await interaction.reply({content: data.content, embeds: data.embeds});
+            await interaction.channel.send({content: data.content, embeds: data.embeds});
         } catch (error) {
             await interaction.reply("```" + error + "```")
         }
