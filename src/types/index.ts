@@ -41,3 +41,22 @@ export interface DiscordServerInfo {
     sources?: string[],
     roles?: { [id: string]: string }
 }
+
+// DiscoHooks
+export interface DiscoHook {
+    content:     string;
+    embeds:      Embed[];
+    attachments: any[];
+}
+
+export interface Embed {
+    title:       string;
+    description: string;
+    color:       number;
+    fields?:     Field[];
+}
+
+export interface Field {
+    name:  string;
+    value: string;
+}
