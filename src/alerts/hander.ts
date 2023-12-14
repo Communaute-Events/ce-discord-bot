@@ -12,7 +12,10 @@ const mongo = new MongoClient(process.env.mongoUri, {
     }
 });
 
+let doingAlert = false;
 export async function alert(data: EventAlert, client: Client) {
+    if (doingAlert) return
+    doingAlert = true
     await mongo.connect()
     const db: Db = mongo.db("discord")
     const collection = db.collection("servers")
@@ -20,6 +23,7 @@ export async function alert(data: EventAlert, client: Client) {
     const servers: DiscordServerInfo[] = await collection.find({ enabled: true }).toArray()
     // Sends in each server
     servers.forEach(async server => {
+        if (!server.sources) return
         if (!server.sources.includes(data.guild.id)) return
         if (!server.channel) return
         let channel: Channel;
@@ -31,13 +35,17 @@ export async function alert(data: EventAlert, client: Client) {
         }
         if (!channel.isTextBased()) return
         const embed = new EmbedBuilder()
-            .setTitle(`Nouvel Event -    ${data.eventSource.name}`)
-            .setDescription(`Un event a été détecté sur le serveur discord "${data.eventSource.name}". Pour plus d'informations, rendez-vous ci-dessous.\n\n`)
-            .setFields({ name: "Contenu du message", value: data.message.data.content })
+            .setTitle(`Nouvel Event - ${data.eventSource.name}`)
+            .setDescription(`Un event a été détecté sur le serveur discord __"${data.eventSource.name}"__. Pour plus d'informations, rendez-vous ci-dessous.\n\n`)
             .setColor(BotInfo.Color)
             .setThumbnail(data.guild.iconUrl)
+        const embed2 = new EmbedBuilder()
+            .setColor("#127065")
+            .setDescription(data.message.data.content.replace(/@/g, "`@`"))
+        const embed3 = new EmbedBuilder()
+            .setDescription("Pour plus d'informations, rendez-vous à l'annonce.")
+            .setColor(BotInfo.Color)
             .setTimestamp()
-            .setFooter({ text: "By Communauté Events - https://github.com/communaute-events" })
         const button = new ButtonBuilder()
             .setStyle(ButtonStyle.Link)
             .setURL(data.message.url)
@@ -45,11 +53,14 @@ export async function alert(data: EventAlert, client: Client) {
         const row = new ActionRowBuilder<ButtonBuilder>()
             .addComponents(button)
         try {
-            const formattedStrings: string[] = Object.values(server.roles).map((roleId) => `<@&${roleId}>`);
-            const formattedString: string = formattedStrings.join(', ');
-            channel.send({ content: server.roles ? formattedString : "@here", embeds: [embed], components: [row] })
+            const formattedString: string = `<@&${server.roles[data.eventSource.guildId]}>`
+            // const formattedStrings: string[] = Object.values(server.roles).map((roleId) => `<@&${roleId}>`);
+            // const formattedString: string = formattedStrings.join(', ');
+            channel.send({ content: server.roles ? formattedString : "@here", embeds: [embed] })
+            channel.send({ embeds: [embed2,embed3], components: [row] })
         } catch (err) {
             // Missing permissions in channel
         }
     })
+    doingAlert = false
 }

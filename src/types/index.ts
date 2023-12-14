@@ -13,7 +13,8 @@ export interface EventSource {
 
 export interface BotConfig {
     'App Name': string
-    Color: `#${string}`
+    Color: `#${string}`,
+    Admins: string[]
 }
 
 export interface HelpCommandCategory {
