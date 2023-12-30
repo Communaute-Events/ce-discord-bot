@@ -30,6 +30,11 @@ const client = new Client({intents: [GatewayIntentBits.Guilds, GatewayIntentBits
 let websockets: WebSocket[] = []
 let isReconnecting;
 
+export let botInfo = {
+    websocket: false,
+    lastConexion: 0
+}
+
 export function closeWebsockets() {
     websockets.forEach(ws => {
         const url = ws.url
@@ -41,6 +46,7 @@ export function closeWebsockets() {
 
 export async function wsConnect(): Promise<WebSocket> {
     function wsError(error) {
+        botInfo.websocket = false
         if (isReconnecting) return
         isReconnecting = true
         logging(`WebSocket error, retrying to connect in 10 seconds.\n${error}: ${error.message}`, "error");
@@ -82,6 +88,8 @@ export async function wsConnect(): Promise<WebSocket> {
 
         ws.on("open",()=> {
             logging(`WebSocket connection has been established. The bot is operational.`,"success")
+            botInfo.websocket = true
+            botInfo.lastConexion = Date.now()
         })
         return ws
     } catch (error) {
