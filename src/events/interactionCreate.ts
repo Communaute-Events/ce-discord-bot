@@ -27,6 +27,7 @@ export const event =  {
             return
         }
         if ("allowDms" in command && command.allowDms == false && interaction.inGuild() == false) {
+            // @ts-ignore
             interaction.reply({ content: "This command is not available in **DMs**.", ephemeral: true})
             return
         }
