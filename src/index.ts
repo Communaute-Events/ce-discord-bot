@@ -89,7 +89,7 @@ export async function wsConnect(): Promise<WebSocket> {
         ws.on("open",()=> {
             logging(`WebSocket connection has been established. The bot is operational.`,"success")
             botInfo.websocket = true
-            botInfo.lastConexion = Date.now()
+            botInfo.lastConexion = Math.floor(new Date().getTime() / 1000)
         })
         return ws
     } catch (error) {

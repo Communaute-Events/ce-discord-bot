@@ -16,7 +16,7 @@ export default {
         
         __WebSocket__
         Status de la connection au WebSocket: ${botInfo.websocket ? '✅' : '❌'}
-        Dernière connection: ${time(new Date())}
+        Dernière connection: ${time(botInfo.lastConexion)}
 
         __Sources__
         ${(await getSources()).map(src => `${src.emoji} - **${src.name}**\n`)}
