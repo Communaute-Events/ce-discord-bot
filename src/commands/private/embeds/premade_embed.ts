@@ -1,7 +1,7 @@
 // @command
 
 import { HelpCommandConfig } from '@src/types';
-import { SlashCommandBuilder, EmbedBuilder, AttachmentBuilder, ChatInputCommandInteraction } from 'discord.js'
+import { SlashCommandBuilder, EmbedBuilder, AttachmentBuilder, ChatInputCommandInteraction, PermissionFlagsBits, Embed } from 'discord.js'
 const Theme = loadYaml("bot/info.yml")
 const HelpConfig: HelpCommandConfig = loadYaml("commands/help.yml")
 import { DiscoHook } from '@src/types';
@@ -10,18 +10,21 @@ import { DiscoHook } from '@src/types';
 // here cuz otherwise tsc removes it
 export default {
 	data: new SlashCommandBuilder()
-		.setName('embed')
-		.setDescription('Sends the embed from the input')
+		.setName('premadembed')
+		.setDescription('Sends the premade embed')
+        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         .addStringOption(option =>
             option
                 .setRequired(true)
                 .setName("embed")
-                .setDescription("Embed data")),
+                .setDescription("Embed name")),
 	async execute(interaction: ChatInputCommandInteraction) {
+        let embeds: EmbedBuilder[];
         try {
-		    const data: DiscoHook = JSON.parse(interaction.options.getString("embed"))
-            await interaction.channel.send({content: data.content, embeds: data.embeds});
-            interaction.reply({content: "Sent.", ephemeral: true})
+		    switch (interaction.options.getString("embed")) {
+                case "roles":
+
+            }
         } catch (error) {
             await interaction.reply("```" + error + "```")
         }
