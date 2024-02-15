@@ -117,7 +117,7 @@ async function automaticWsRestart() {
 async function updateStatus(client: Client) {
     client.user.setPresence({
         activities: [{
-            name: `to ${(await getSources()).length} events sources for ${client.guilds.cache.size} servers`,
+            name: `${(await getSources()).length} sources d'évents pour ${client.guilds.cache.size} servers`,
             type: ActivityType.Watching,
             url: "https://commu.events/projects/events-helper"
         }],
