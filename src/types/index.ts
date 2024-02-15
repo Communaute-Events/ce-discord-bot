@@ -11,11 +11,11 @@ export interface EventSource {
 
 // Config
 
-// export interface BotConfig {
-//     'App Name': string
-//     Color: `#${string}`,
-//     Admins: string[]
-// }
+export interface BotConfig {
+    'App Name': string
+    Color: `#${string}`,
+    Admins: string[]
+}
 
 // export interface RolesConfig {
 //     'Roles': {
