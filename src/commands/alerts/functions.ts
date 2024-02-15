@@ -240,3 +240,18 @@ export async function bind(interaction: ChatInputCommandInteraction, operation: 
         }
     }
 }
+
+// async function sendPanel(interaction: ChatInputCommandInteraction) {
+//     try {
+//         await mongo.connect()
+//         const db: Db = mongo.db("discord")
+
+//         const collection: Collection = db.collection("servers")
+//         const savedSources: any[] = (await collection.findOne({ id: interaction.guild.id })).sources || []
+//         const sources = await getSources()
+//         const enabledSources: EventSource[] = savedSources.map(src => sources.find(s => s.guildId === src))
+//         interaction.reply(enabledSources.toString())
+//     } catch (err) {
+//         logging(`An error occured while sending the roles panel:\n${err}`,"error")
+//     }
+// }

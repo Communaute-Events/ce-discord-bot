@@ -9,9 +9,10 @@ import { initEvents } from "./core/events"
 import { alert } from "./alerts/hander"
 
 // Imports
-import { Client, Events, GatewayIntentBits, messageLink } from "discord.js"
+import { ActivityType, Client, Events, GatewayIntentBits, Status, messageLink } from "discord.js"
 import { WebSocket } from "ws"
 import fetch from "cross-fetch"
+import { getSources } from "./commands/alerts/functions"
 
 // Main
 const client = new Client({intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent]});
@@ -113,6 +114,17 @@ async function automaticWsRestart() {
     logging(`Finished automated restarting function.`,"success")
 }
 
+async function updateStatus(client: Client) {
+    client.user.setPresence({
+        activities: [{
+            name: `to ${(await getSources()).length} events sources for ${client.guilds.cache.size} servers`,
+            type: ActivityType.Watching,
+            url: "https://commu.events/projects/events-helper"
+        }],
+        status: "online"
+    })
+}
+
 client.once(Events.ClientReady, async(c) => {
     logging("Init. Client...","info")
 	logging(ansi(`Logged in as %bold%${c.user.tag}%end%%light_green%!%end%`),"success");
@@ -124,6 +136,10 @@ client.once(Events.ClientReady, async(c) => {
     logging(`Connecting to the Event Websocket`,"info")
     await wsConnect()
     setInterval(automaticWsRestart,600000)
+    updateStatus(client)
+    setInterval((client)=>{
+        updateStatus(client)
+    })
 });
 
 // Login, needs to be at the bottom
