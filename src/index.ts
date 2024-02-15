@@ -119,13 +119,13 @@ async function updateStatus(client: Client) {
         activities: [{
             name: `${(await getSources()).length} sources d'évents pour ${client.guilds.cache.size} servers`,
             type: ActivityType.Watching,
-            url: "https://commu.events/projects/events-helper"
+            url: "https://commu.events/projects/events-helper",
         }],
-        status: "online"
+        status: "online",
     })
 }
 
-client.once(Events.ClientReady, async(c) => {
+client.once(Events.ClientReady, async(c: Client) => {
     logging("Init. Client...","info")
 	logging(ansi(`Logged in as %bold%${c.user.tag}%end%%light_green%!%end%`),"success");
     logging(`Initalizing Events...`,"info")
@@ -137,8 +137,9 @@ client.once(Events.ClientReady, async(c) => {
     await wsConnect()
     setInterval(automaticWsRestart,600000)
     updateStatus(client)
-    setInterval((client)=>{
-        updateStatus(client)
+    console.log(c)
+    setInterval(()=>{
+        updateStatus(c)
     })
 });
 
