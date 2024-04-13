@@ -17,6 +17,19 @@ export interface BotConfig {
     Admins: string[]
 }
 
+// export interface RolesConfig {
+//     'Roles': {
+//         name: string
+//         emoji: string,
+//         id: string
+//     }[]
+//     'Event Roles': {
+//         name: string
+//         emoji: string,
+//         id: string
+//     }[]
+// }
+
 export interface HelpCommandCategory {
     name: string,
     command: string,

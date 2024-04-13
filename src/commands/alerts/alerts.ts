@@ -17,6 +17,11 @@ export default {
                         .setDescription("Le salon dans lequel les alertes seront envoyées")
                         .addChannelTypes(ChannelType.GuildText)
                         .setRequired(true)))
+        // .addSubcommand(subcommand =>
+        //     subcommand
+        //         .setName("panel")
+        //         .setDescription("Envoie le panel de séléction de rôles")
+        // )
         .addSubcommand(subcommand =>
             subcommand
                 .setName("enable")

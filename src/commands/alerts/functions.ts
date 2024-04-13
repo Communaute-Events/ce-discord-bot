@@ -1,11 +1,11 @@
 import { logging } from "../../core/utilities";
 import { ChatInputCommandInteraction, EmbedBuilder, StringSelectMenuBuilder, ActionRowBuilder, AttachmentBuilder, ComponentType, StringSelectMenuOptionBuilder } from "discord.js";
 import { Collection, Db, MongoClient, ServerApiVersion } from "mongodb";
-import { BotConfig, DiscordServerInfo } from '@src/types';
+import { /*BotConfi,*/ DiscordServerInfo } from '@src/types';
 import { EventSource } from "@src/types"
 import fetch from "cross-fetch";
 import emojiRegex from "emoji-regex";
-const BotInfo: BotConfig = loadYaml("bot/info.yml")
+const BotInfo/*: BotConfig*/ = loadYaml("bot/info.yml")
 
 const mongo = new MongoClient(process.env.mongoUri, {
     serverApi: {
@@ -240,3 +240,18 @@ export async function bind(interaction: ChatInputCommandInteraction, operation: 
         }
     }
 }
+
+// async function sendPanel(interaction: ChatInputCommandInteraction) {
+//     try {
+//         await mongo.connect()
+//         const db: Db = mongo.db("discord")
+
+//         const collection: Collection = db.collection("servers")
+//         const savedSources: any[] = (await collection.findOne({ id: interaction.guild.id })).sources || []
+//         const sources = await getSources()
+//         const enabledSources: EventSource[] = savedSources.map(src => sources.find(s => s.guildId === src))
+//         interaction.reply(enabledSources.toString())
+//     } catch (err) {
+//         logging(`An error occured while sending the roles panel:\n${err}`,"error")
+//     }
+// }
